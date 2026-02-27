@@ -14,7 +14,7 @@ human oversight at each stage.
 - **Project:** Claude Max Usage Analytics
 - **Live URL:** brennan.games/claudemd/usage
 - **Repos:** claude-max-usage-analytics
-- **GitHub Project:** https://github.com/bh679?tab=projects (Project #{{PROJECT_NUMBER}})
+- **GitHub Project:** https://github.com/bh679?tab=projects (Project #4)
 - **Wiki:** https://github.com/bh679/Claude-Max-Usage-Analytics/wiki
 
 ---
@@ -96,7 +96,7 @@ Each session has an immutable UUID and an editable title.
 
 ```bash
 # Find existing item
-gh project item-list {{PROJECT_NUMBER}} --owner bh679 --format json | jq '.items[] | select(.title | test("search term"; "i"))'
+gh project item-list 4 --owner bh679 --format json | jq '.items[] | select(.title | test("search term"; "i"))'
 
 # Update item status
 gh project item-edit --project-id <id> --id <item-id> --field-id <status-field-id> --single-select-option-id <option-id>
