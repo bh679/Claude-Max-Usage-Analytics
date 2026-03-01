@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usage — Claude Max Usage Analytics</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Usage</h1>
+    </header>
+
+    <div id="no-data" class="no-data">
+      <p>No usage data yet. Run the scraper to get started:</p>
+      <code>node capture/scrape-usage.js --refresh --post</code>
+    </div>
+
+    <div id="dashboard" class="dashboard hidden">
+      <!-- Plan Usage Limits -->
+      <section class="section">
+        <h2>Plan usage limits</h2>
+        <p class="last-updated" id="last-updated"></p>
+
+        <div class="meter">
+          <div class="meter-header">
+            <span class="meter-label">Current session</span>
+            <span class="meter-reset" id="session-reset"></span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="session-bar"></div>
+          </div>
+          <span class="meter-percent" id="session-percent"></span>
+        </div>
+
+        <div class="meter">
+          <div class="meter-header">
+            <span class="meter-label">All models</span>
+            <span class="meter-reset" id="all-models-reset"></span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="all-models-bar"></div>
+          </div>
+          <span class="meter-percent" id="all-models-percent"></span>
+        </div>
+
+        <div class="meter">
+          <div class="meter-header">
+            <span class="meter-label">Sonnet only</span>
+            <span class="meter-reset" id="sonnet-reset"></span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="sonnet-bar"></div>
+          </div>
+          <span class="meter-percent" id="sonnet-percent"></span>
+        </div>
+      </section>
+
+      <!-- Extra Usage -->
+      <section class="section" id="extra-usage-section">
+        <h2>Extra usage</h2>
+
+        <div class="extra-stats">
+          <div class="stat">
+            <span class="stat-value" id="amount-spent"></span>
+            <span class="stat-label">spent</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="spend-limit"></span>
+            <span class="stat-label">Monthly spend limit</span>
+          </div>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="spend-bar"></div>
+        </div>
+
+        <div class="extra-details">
+          <div class="detail">
+            <span class="detail-value" id="current-balance"></span>
+            <span class="detail-label">Current balance</span>
+          </div>
+          <div class="detail">
+            <span class="detail-value" id="auto-reload"></span>
+            <span class="detail-label">Auto-reload</span>
+          </div>
+          <div class="detail">
+            <span class="detail-value" id="extra-reset-date"></span>
+            <span class="detail-label">Resets</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Account Info -->
+      <section class="section account-info">
+        <div class="detail">
+          <span class="detail-value" id="plan-name"></span>
+          <span class="detail-label">Plan</span>
+        </div>
+        <div class="detail">
+          <span class="detail-value" id="country"></span>
+          <span class="detail-label">Country</span>
+        </div>
+      </section>
+
+      <!-- Snapshot Timestamp -->
+      <footer class="snapshot-footer">
+        <span id="scraped-at"></span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
