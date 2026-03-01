@@ -4,4 +4,5 @@ node_modules/
 test-results/
 playwright-report/
 .auth-state.json
+capture/saved-page/
 .claude/settings.local.json

@@ -4,15 +4,17 @@
  * Uses saved auth state + real Chrome (non-headless) to bypass Cloudflare.
  *
  * Setup (one-time):
- *   node "Claude Analytics/playwright auth testing/save-auth.js"
+ *   node capture/save-auth.js
  *
  * Usage:
- *   node "Claude Analytics/playwright auth testing/scrape-usage.js"
+ *   node capture/scrape-usage.js
  *
  * Options:
- *   --refresh     Click the refresh button before scraping
- *   --output=json Output JSON to stdout (for piping)
- *   --save        Save JSON to a timestamped file
+ *   --refresh       Click the refresh button before scraping
+ *   --output=json   Output JSON to stdout (for piping)
+ *   --save          Save JSON to a timestamped file
+ *   --post          POST extracted JSON to http://localhost:8080/api/scrape
+ *   --post-url=URL  POST to a custom URL instead of the default
  */
 const { chromium } = require('playwright');
 const path = require('path');
@@ -23,6 +25,8 @@ const args = process.argv.slice(2);
 const doRefresh = args.includes('--refresh');
 const jsonOutput = args.includes('--output=json');
 const saveToFile = args.includes('--save');
+const doPost = args.includes('--post') || args.some(a => a.startsWith('--post-url='));
+const postUrl = (args.find(a => a.startsWith('--post-url=')) || '').split('=')[1] || 'http://localhost:8080/api/scrape';
 
 function log(...msg) {
   if (!jsonOutput) console.log(...msg);
@@ -31,7 +35,7 @@ function log(...msg) {
 async function main() {
   if (!fs.existsSync(AUTH_FILE)) {
     console.error('No auth state found. Run save-auth.js first:');
-    console.error('  node "Claude Analytics/playwright auth testing/save-auth.js"');
+    console.error('  node capture/save-auth.js');
     process.exit(1);
   }
 
@@ -154,6 +158,21 @@ async function main() {
     const outFile = path.join(__dirname, `usage-${timestamp}.json`);
     fs.writeFileSync(outFile, JSON.stringify(data, null, 2));
     log(`\nSaved to: ${outFile}`);
+  }
+
+  if (doPost) {
+    log(`\nPOSTing data to ${postUrl}...`);
+    const res = await fetch(postUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (res.ok) {
+      const body = await res.json();
+      log(`Posted successfully. Snapshot ID: ${body.id}`);
+    } else {
+      console.error(`POST failed: ${res.status} ${res.statusText}`);
+    }
   }
 
   // Update auth state in case cookies were refreshed during the session
