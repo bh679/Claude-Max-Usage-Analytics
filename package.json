@@ -1,6 +1,6 @@
 {
   "name": "claude-max-usage-analytics",
-  "version": "1.00.0001",
+  "version": "1.00.0002",
   "description": "Dashboard that replicates claude.ai/settings/usage, powered by Playwright scraping.",
   "main": "server/index.js",
   "scripts": {
