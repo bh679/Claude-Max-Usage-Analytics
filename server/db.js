@@ -88,7 +88,7 @@ function insertSnapshot(data) {
     spend_limit: extra.spendLimit ?? null,
     spend_percent: exact.extraUsageSpend ?? null,
     current_balance: extra.currentBalance ?? null,
-    auto_reload: extra.autoReload ?? null,
+    auto_reload: extra.autoReload == null ? null : extra.autoReload ? 1 : 0,
     extra_reset_date: extra.resetDate ?? null,
     plan: account.plan ?? null,
     country: account.country ?? null,
