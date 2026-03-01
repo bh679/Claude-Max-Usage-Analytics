@@ -1,15 +1,22 @@
 {
   "name": "claude-max-usage-analytics",
-  "version": "1.00.0000",
-  "description": "Project-level configuration for Claude Max Usage Analytics. Contains the Product Engineer agent instructions, permissions, and test configuration.",
-  "main": "index.js",
+  "version": "1.00.0001",
+  "description": "Dashboard that replicates claude.ai/settings/usage, powered by Playwright scraping.",
+  "main": "server/index.js",
   "scripts": {
+    "start": "node server/index.js",
     "test": "playwright test",
     "test:report": "playwright show-report"
   },
   "keywords": [],
   "author": "bh679",
   "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "express": "^4.21.0"
+  },
   "devDependencies": {
     "@playwright/test": "^1.58.2"
   }
