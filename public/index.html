@@ -12,6 +12,31 @@
       <h1>Usage</h1>
     </header>
 
+    <!-- Scrape Management Status Bar -->
+    <div class="status-bar">
+      <div class="status-left">
+        <span class="auth-dot" id="auth-status-dot"></span>
+        <span class="auth-status-text" id="auth-status-text">Checking...</span>
+        <a class="auth-reauth-link hidden" id="auth-reauth-link"
+           href="#scrape-log" title="Run: node capture/save-auth.js">Re-auth required</a>
+      </div>
+      <div class="status-center">
+        <span class="status-meta">
+          Last: <span id="last-scraped-relative">—</span>
+          <span class="status-meta-abs" id="last-scraped-absolute"></span>
+        </span>
+        <span class="status-meta" id="next-scrape-wrap">
+          Next: <span id="next-scrape-countdown">—</span>
+        </span>
+      </div>
+      <div class="status-right">
+        <button class="scrape-now-btn" id="scrape-now-btn" onclick="scrapeNow()">
+          <span id="scrape-spinner" class="scrape-spinner hidden"></span>
+          Scrape Now
+        </button>
+      </div>
+    </div>
+
     <div id="no-data" class="no-data">
       <p>No usage data yet. Run the scraper to get started:</p>
       <code>node capture/scrape-usage.js --refresh --post</code>
@@ -109,6 +134,23 @@
         <span id="scraped-at"></span>
       </footer>
     </div>
+
+    <!-- Scrape History Log -->
+    <section class="section scrape-log-section" id="scrape-log">
+      <h2>Scrape history</h2>
+      <table class="scrape-log">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Status</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody id="scrape-log-tbody">
+          <tr><td colspan="3" class="log-empty">No scrape history yet.</td></tr>
+        </tbody>
+      </table>
+    </section>
   </div>
 
   <script src="app.js"></script>

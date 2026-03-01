@@ -10,6 +10,17 @@ function initDb() {
   db.pragma('journal_mode = WAL');
 
   db.exec(`
+    CREATE TABLE IF NOT EXISTS scrape_log (
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      started_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+      completed_at DATETIME,
+      status       TEXT NOT NULL,
+      duration_ms  INTEGER,
+      error_msg    TEXT
+    )
+  `);
+
+  db.exec(`
     CREATE TABLE IF NOT EXISTS scrape_snapshots (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       scraped_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -121,4 +132,26 @@ function getSnapshots({ from, to, limit = 100 } = {}) {
   return db.prepare(sql).all(params);
 }
 
-module.exports = { initDb, insertSnapshot, getLatestSnapshot, getSnapshots };
+function insertScrapeLog({ status, duration_ms = null, error_msg = null } = {}) {
+  const stmt = db.prepare(`
+    INSERT INTO scrape_log (completed_at, status, duration_ms, error_msg)
+    VALUES (CURRENT_TIMESTAMP, @status, @duration_ms, @error_msg)
+  `);
+  const info = stmt.run({ status, duration_ms, error_msg });
+  return info.lastInsertRowid;
+}
+
+function getRecentScrapeLog(limit = 20) {
+  return db.prepare('SELECT * FROM scrape_log ORDER BY id DESC LIMIT ?').all(limit);
+}
+
+function getScheduleInfo() {
+  const intervalHours = parseInt(process.env.SCRAPE_INTERVAL_HOURS || '4', 10);
+  return { intervalHours };
+}
+
+module.exports = {
+  initDb,
+  insertSnapshot, getLatestSnapshot, getSnapshots,
+  insertScrapeLog, getRecentScrapeLog, getScheduleInfo,
+};
