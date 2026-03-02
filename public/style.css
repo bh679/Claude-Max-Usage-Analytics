@@ -168,3 +168,173 @@ header h1 {
   text-align: center;
   padding-top: 16px;
 }
+
+/* ── Status Bar ───────────────────────────────────────────────────────────── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.status-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 140px;
+}
+
+.auth-dot-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-center {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.status-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Auth dot */
+.auth-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #555;
+}
+
+.auth-dot.auth-ok      { background: #4caf78; }
+.auth-dot.auth-aging   { background: #e8a838; }
+.auth-dot.auth-expired { background: #e85555; }
+.auth-dot.auth-unknown { background: #555; }
+
+.auth-status-text {
+  color: #ccc;
+  font-size: 13px;
+}
+
+.auth-reauth-link {
+  color: #e85555;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth-refresh-time {
+  font-size: 11px;
+  color: #666;
+  padding-left: 16px; /* indent under dot */
+}
+
+.auth-expiry-time {
+  font-size: 11px;
+  color: #666;
+  padding-left: 16px;
+}
+
+.auth-expiry-time.auth-expiry-soon   { color: #e8a838; }
+.auth-expiry-time.auth-expiry-urgent { color: #e85555; font-weight: 600; }
+
+/* Status metadata (timestamps) */
+.status-meta {
+  color: #888;
+  white-space: nowrap;
+}
+
+.status-meta-abs {
+  color: #666;
+  margin-left: 4px;
+  font-size: 12px;
+}
+
+/* Scrape Now button */
+.scrape-now-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #5ba8a0;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.scrape-now-btn:hover:not(:disabled) { background: #4a9088; }
+.scrape-now-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Spinner */
+.scrape-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Scrape History Log ───────────────────────────────────────────────────── */
+.scrape-log-section {
+  margin-top: 8px;
+}
+
+.scrape-log {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+  margin-top: 12px;
+}
+
+.scrape-log th {
+  text-align: left;
+  color: #888;
+  font-weight: 500;
+  padding: 6px 8px;
+  border-bottom: 1px solid #333;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.scrape-log td {
+  padding: 7px 8px;
+  border-bottom: 1px solid #2a2a2a;
+  color: #c8c8c8;
+}
+
+.scrape-log tr:last-child td { border-bottom: none; }
+
+.status-success    { color: #4caf78; }
+.status-fail       { color: #e85555; }
+.status-auth-needed { color: #e8a838; }
+
+.log-empty {
+  color: #666;
+  text-align: center;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}

@@ -33,6 +33,8 @@ function log(...msg) {
 }
 
 async function main() {
+  const startMs = Date.now();
+
   if (!fs.existsSync(AUTH_FILE)) {
     console.error('No auth state found. Run save-auth.js first:');
     console.error('  node capture/save-auth.js');
@@ -59,9 +61,9 @@ async function main() {
 
   const finalUrl = page.url();
   if (finalUrl.includes('/login') || finalUrl.includes('/oauth')) {
-    console.error('Auth expired. Re-run save-auth.js to refresh.');
+    console.error('AUTH_REQUIRED: Auth expired. Re-run save-auth.js to refresh.');
     await browser.close();
-    process.exit(1);
+    process.exit(2);
   }
 
   if (doRefresh) {
@@ -123,6 +125,7 @@ async function main() {
 
     result.timestamp = new Date().toISOString();
     return result;
+
   });
 
   if (jsonOutput) {
@@ -162,10 +165,11 @@ async function main() {
 
   if (doPost) {
     log(`\nPOSTing data to ${postUrl}...`);
+    const scrape_duration_ms = Date.now() - startMs;
     const res = await fetch(postUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, scrape_duration_ms }),
     });
     if (res.ok) {
       const body = await res.json();
