@@ -244,16 +244,101 @@ function formatPlanName(plan) {
   return plan.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
+// --- OTel Real-time Telemetry (piped into existing dashboard sections) ---
+
+async function loadOtelData() {
+  try {
+    const res = await fetch('/api/otel/summary');
+    const data = await res.json();
+
+    const otelAvailable = data.tokenUsage?.length > 0 || data.totalCost > 0 || data.activeSessions?.length > 0;
+
+    // Inline token counts (inside Plan Usage Limits section)
+    const tokensInline = document.getElementById('otel-tokens-inline');
+    if (tokensInline) {
+      if (otelAvailable && data.tokenUsage?.length > 0) {
+        tokensInline.classList.remove('hidden');
+        const tokenMap = {};
+        for (const t of data.tokenUsage) tokenMap[t.type] = t.total_tokens;
+        document.getElementById('otel-input-tokens').textContent = formatNumber(tokenMap['input'] || 0);
+        document.getElementById('otel-output-tokens').textContent = formatNumber(tokenMap['output'] || 0);
+        document.getElementById('otel-cache-read').textContent = formatNumber(tokenMap['cacheRead'] || 0);
+        document.getElementById('otel-cache-create').textContent = formatNumber(tokenMap['cacheCreation'] || 0);
+      } else {
+        tokensInline.classList.add('hidden');
+      }
+    }
+
+    // Inline cost (inside Extra Usage section)
+    const costInline = document.getElementById('otel-cost-inline');
+    if (costInline) {
+      if (otelAvailable && data.totalCost > 0) {
+        costInline.classList.remove('hidden');
+        document.getElementById('otel-cost').textContent = '$' + data.totalCost.toFixed(4);
+      } else {
+        costInline.classList.add('hidden');
+      }
+    }
+
+    // Inline sessions (inside Account Info section)
+    const sessionsInline = document.getElementById('otel-sessions-inline');
+    if (sessionsInline) {
+      if (otelAvailable && data.activeSessions?.length > 0) {
+        sessionsInline.classList.remove('hidden');
+        document.getElementById('otel-sessions').textContent = data.activeSessions.length;
+      } else {
+        sessionsInline.classList.add('hidden');
+      }
+    }
+
+    // Tool usage section (inside dashboard, shown when tool data exists)
+    const toolsSection = document.getElementById('otel-tools-section');
+    const toolContainer = document.getElementById('otel-tool-items');
+    if (toolsSection && toolContainer) {
+      if (data.toolUsage && data.toolUsage.length > 0) {
+        toolsSection.classList.remove('hidden');
+        const maxCount = Math.max(...data.toolUsage.map(t => t.count));
+        toolContainer.innerHTML = data.toolUsage.map(tool => {
+          const name = escapeHtml(tool.tool_name || 'unknown');
+          const pct = (tool.count / maxCount * 100).toFixed(1);
+          return `<div class="otel-tool-item">
+            <span class="otel-tool-name">${name}</span>
+            <div class="otel-tool-bar-track">
+              <div class="otel-tool-bar-fill" style="width: ${pct}%"></div>
+            </div>
+            <span class="otel-tool-count">${tool.count}</span>
+          </div>`;
+        }).join('');
+      } else {
+        toolsSection.classList.add('hidden');
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load OTel data:', err);
+  }
+}
+
+function formatNumber(num) {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+  return num.toLocaleString();
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 loadData();
 loadStatus();
 loadScrapeLog();
+loadOtelData();
 
 // Auto-refresh usage data every 5 minutes
 setInterval(loadData, 5 * 60 * 1000);
-// Refresh status bar every 30 seconds
+// Refresh status bar and scrape log every 30 seconds
 setInterval(() => { loadStatus(); loadScrapeLog(); }, 30 * 1000);
-// Update relative time / countdown every minute
-setInterval(() => {
-  loadStatus();
-}, 60 * 1000);
+// Refresh OTel data every 30 seconds
+setInterval(loadOtelData, 30 * 1000);
