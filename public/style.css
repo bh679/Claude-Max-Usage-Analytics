@@ -186,9 +186,15 @@ header h1 {
 
 .status-left {
   display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 140px;
+}
+
+.auth-dot-row {
+  display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 120px;
 }
 
 .status-center {
@@ -229,6 +235,21 @@ header h1 {
   text-decoration: underline;
   cursor: pointer;
 }
+
+.auth-refresh-time {
+  font-size: 11px;
+  color: #666;
+  padding-left: 16px; /* indent under dot */
+}
+
+.auth-expiry-time {
+  font-size: 11px;
+  color: #666;
+  padding-left: 16px;
+}
+
+.auth-expiry-time.auth-expiry-soon   { color: #e8a838; }
+.auth-expiry-time.auth-expiry-urgent { color: #e85555; font-weight: 600; }
 
 /* Status metadata (timestamps) */
 .status-meta {

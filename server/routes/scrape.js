@@ -1,6 +1,10 @@
 const express = require('express');
 const { spawn } = require('child_process');
 const path = require('path');
+const fs = require('fs');
+
+const AUTH_FILE = path.join(__dirname, '..', '..', 'capture', '.auth-state.json');
+const AUTH_EXPIRY_DAYS = parseInt(process.env.AUTH_EXPIRY_DAYS || '30', 10);
 const {
   insertSnapshot, getLatestSnapshot, getSnapshots,
   insertScrapeLog, getRecentScrapeLog, getScheduleInfo,
@@ -127,12 +131,25 @@ router.get('/status', (req, res) => {
     nextScheduledAt = new Date(lastMs + intervalHours * 60 * 60 * 1000).toISOString();
   }
 
+  // Auth file age + estimated expiry
+  let authFileLastRefreshed = null;
+  let authFileExpiresAt = null;
+  try {
+    const stat = fs.statSync(AUTH_FILE);
+    authFileLastRefreshed = stat.mtime.toISOString();
+    authFileExpiresAt = new Date(stat.mtimeMs + AUTH_EXPIRY_DAYS * 86400000).toISOString();
+  } catch (_) {
+    // Auth file doesn't exist — leave null
+  }
+
   res.json({
     lastScraped,
     authStatus,
     nextScheduledAt,
     isScraping,
     intervalHours,
+    authFileLastRefreshed,
+    authFileExpiresAt,
   });
 });
 

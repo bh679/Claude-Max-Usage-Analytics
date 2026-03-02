@@ -15,10 +15,14 @@
     <!-- Scrape Management Status Bar -->
     <div class="status-bar">
       <div class="status-left">
-        <span class="auth-dot" id="auth-status-dot"></span>
-        <span class="auth-status-text" id="auth-status-text">Checking...</span>
-        <a class="auth-reauth-link hidden" id="auth-reauth-link"
-           href="#scrape-log" title="Run: node capture/save-auth.js">Re-auth required</a>
+        <div class="auth-dot-row">
+          <span class="auth-dot" id="auth-status-dot"></span>
+          <span class="auth-status-text" id="auth-status-text">Checking...</span>
+          <a class="auth-reauth-link hidden" id="auth-reauth-link"
+             href="#scrape-log" title="Run: node capture/save-auth.js">Re-auth required</a>
+        </div>
+        <span class="auth-refresh-time" id="auth-refresh-time"></span>
+        <span class="auth-expiry-time"  id="auth-expiry-time"></span>
       </div>
       <div class="status-center">
         <span class="status-meta">

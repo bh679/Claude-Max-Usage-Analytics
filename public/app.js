@@ -32,13 +32,17 @@ function formatAbsolute(isoString) {
 }
 
 // ── Auth status display ───────────────────────────────────────────────────────
-function updateAuthUI(authStatus) {
+function updateAuthUI(status) {
   const dot = document.getElementById('auth-status-dot');
   const text = document.getElementById('auth-status-text');
   const link = document.getElementById('auth-reauth-link');
+  const refreshEl = document.getElementById('auth-refresh-time');
+  const expiryEl = document.getElementById('auth-expiry-time');
 
   dot.className = 'auth-dot';
   link.classList.add('hidden');
+
+  const authStatus = typeof status === 'string' ? status : status.authStatus;
 
   if (authStatus === 'ok') {
     dot.classList.add('auth-ok');
@@ -54,6 +58,35 @@ function updateAuthUI(authStatus) {
     dot.classList.add('auth-unknown');
     text.textContent = 'No scrapes yet';
   }
+
+  // Auth file age + expiry
+  if (status && typeof status === 'object') {
+    if (status.authFileLastRefreshed) {
+      refreshEl.textContent = 'Refreshed ' + relativeTime(status.authFileLastRefreshed);
+    } else {
+      refreshEl.textContent = '';
+    }
+
+    if (status.authFileExpiresAt) {
+      const msUntilExpiry = new Date(status.authFileExpiresAt).getTime() - Date.now();
+      const daysLeft = Math.ceil(msUntilExpiry / 86400000);
+      const expiryDate = new Date(status.authFileExpiresAt)
+        .toLocaleDateString([], { month: 'short', day: 'numeric' });
+
+      if (daysLeft <= 0) {
+        expiryEl.textContent = 'Expires today';
+        expiryEl.className = 'auth-expiry-time auth-expiry-urgent';
+      } else if (daysLeft <= 3) {
+        expiryEl.textContent = `Expires ~${expiryDate} (${daysLeft}d)`;
+        expiryEl.className = 'auth-expiry-time auth-expiry-soon';
+      } else {
+        expiryEl.textContent = `Expires ~${expiryDate}`;
+        expiryEl.className = 'auth-expiry-time';
+      }
+    } else {
+      expiryEl.textContent = '';
+    }
+  }
 }
 
 // ── Status bar polling ────────────────────────────────────────────────────────
@@ -62,7 +95,7 @@ async function loadStatus() {
     const res = await fetch('/api/scrape/status');
     const status = await res.json();
 
-    updateAuthUI(status.authStatus);
+    updateAuthUI(status);
 
     document.getElementById('last-scraped-relative').textContent =
       relativeTime(status.lastScraped);
