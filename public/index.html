@@ -84,17 +84,6 @@
           </div>
           <span class="meter-percent" id="sonnet-percent"></span>
         </div>
-
-        <!-- OTel: real-time token counts (shown inline when telemetry data exists) -->
-        <div class="otel-inline hidden" id="otel-tokens-inline">
-          <p class="otel-inline-header"><span class="otel-live"></span> Live token usage</p>
-          <div class="otel-inline-stats">
-            <span class="otel-inline-stat"><strong id="otel-input-tokens">—</strong> input</span>
-            <span class="otel-inline-stat"><strong id="otel-output-tokens">—</strong> output</span>
-            <span class="otel-inline-stat"><strong id="otel-cache-read">—</strong> cache read</span>
-            <span class="otel-inline-stat"><strong id="otel-cache-create">—</strong> cache write</span>
-          </div>
-        </div>
       </section>
 
       <!-- Extra Usage -->
@@ -129,11 +118,6 @@
             <span class="detail-value" id="extra-reset-date"></span>
             <span class="detail-label">Resets</span>
           </div>
-          <!-- OTel: live API cost -->
-          <div class="detail hidden" id="otel-cost-inline">
-            <span class="detail-value" id="otel-cost">—</span>
-            <span class="detail-label"><span class="otel-live"></span> API cost</span>
-          </div>
         </div>
       </section>
 
@@ -146,19 +130,6 @@
         <div class="detail">
           <span class="detail-value" id="country"></span>
           <span class="detail-label">Country</span>
-        </div>
-        <!-- OTel: active sessions -->
-        <div class="detail hidden" id="otel-sessions-inline">
-          <span class="detail-value" id="otel-sessions">—</span>
-          <span class="detail-label"><span class="otel-live"></span> Sessions</span>
-        </div>
-      </section>
-
-      <!-- OTel: Tool usage (only shown when telemetry data exists) -->
-      <section class="section hidden" id="otel-tools-section">
-        <h2>Tool usage <span class="otel-live"></span></h2>
-        <div id="otel-tool-items">
-          <p class="otel-empty">No tool data yet</p>
         </div>
       </section>
 

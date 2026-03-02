@@ -1,6 +1,6 @@
 # Phase 3: OpenTelemetry Integration
 
-## Status: Implemented
+## Status: Not started (depends on Phase 1)
 
 ## Goal
 

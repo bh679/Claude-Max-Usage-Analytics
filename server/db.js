@@ -52,34 +52,6 @@ function initDb() {
     )
   `);
 
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS otel_metrics (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      received_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      metric_name TEXT NOT NULL,
-      value REAL NOT NULL,
-      unit TEXT,
-      attributes TEXT,
-      session_id TEXT,
-      resource TEXT,
-      time_unix_nano TEXT
-    )
-  `);
-
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS otel_events (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      received_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      event_name TEXT NOT NULL,
-      body TEXT,
-      attributes TEXT,
-      session_id TEXT,
-      prompt_id TEXT,
-      resource TEXT,
-      time_unix_nano TEXT
-    )
-  `);
-
   return db;
 }
 
@@ -178,100 +150,8 @@ function getScheduleInfo() {
   return { intervalHours };
 }
 
-// --- OTel metric/event storage ---
-
-function insertOtelMetricsBatch(rows) {
-  const stmt = db.prepare(`
-    INSERT INTO otel_metrics (metric_name, value, unit, attributes, session_id, resource, time_unix_nano)
-    VALUES (@metric_name, @value, @unit, @attributes, @session_id, @resource, @time_unix_nano)
-  `);
-  const insertMany = db.transaction((items) => {
-    for (const item of items) stmt.run(item);
-  });
-  insertMany(rows);
-}
-
-function insertOtelEventsBatch(rows) {
-  const stmt = db.prepare(`
-    INSERT INTO otel_events (event_name, body, attributes, session_id, prompt_id, resource, time_unix_nano)
-    VALUES (@event_name, @body, @attributes, @session_id, @prompt_id, @resource, @time_unix_nano)
-  `);
-  const insertMany = db.transaction((items) => {
-    for (const item of items) stmt.run(item);
-  });
-  insertMany(rows);
-}
-
-function getOtelMetrics({ metric_name, since, session_id, limit = 500 } = {}) {
-  let sql = 'SELECT * FROM otel_metrics WHERE 1=1';
-  const params = {};
-  if (metric_name) { sql += ' AND metric_name = @metric_name'; params.metric_name = metric_name; }
-  if (since) { sql += ' AND received_at >= @since'; params.since = since; }
-  if (session_id) { sql += ' AND session_id = @session_id'; params.session_id = session_id; }
-  sql += ' ORDER BY id DESC LIMIT @limit';
-  params.limit = limit;
-  return db.prepare(sql).all(params);
-}
-
-function getOtelEvents({ event_name, since, session_id, limit = 500 } = {}) {
-  let sql = 'SELECT * FROM otel_events WHERE 1=1';
-  const params = {};
-  if (event_name) { sql += ' AND event_name = @event_name'; params.event_name = event_name; }
-  if (since) { sql += ' AND received_at >= @since'; params.since = since; }
-  if (session_id) { sql += ' AND session_id = @session_id'; params.session_id = session_id; }
-  sql += ' ORDER BY id DESC LIMIT @limit';
-  params.limit = limit;
-  return db.prepare(sql).all(params);
-}
-
-function getOtelSummary({ since } = {}) {
-  const sinceClause = since ? 'AND received_at >= @since' : '';
-  const params = since ? { since } : {};
-
-  const tokenUsage = db.prepare(`
-    SELECT
-      json_extract(attributes, '$.type') as type,
-      SUM(value) as total_tokens
-    FROM otel_metrics
-    WHERE metric_name = 'claude_code.token.usage' ${sinceClause}
-    GROUP BY json_extract(attributes, '$.type')
-  `).all(params);
-
-  const costRow = db.prepare(`
-    SELECT SUM(value) as total_cost
-    FROM otel_metrics
-    WHERE metric_name = 'claude_code.cost.usage' ${sinceClause}
-  `).get(params);
-
-  const sessions = db.prepare(`
-    SELECT DISTINCT session_id
-    FROM otel_metrics
-    WHERE session_id IS NOT NULL ${sinceClause}
-  `).all(params);
-
-  const toolUsage = db.prepare(`
-    SELECT
-      json_extract(attributes, '$.tool_name') as tool_name,
-      COUNT(*) as count
-    FROM otel_events
-    WHERE event_name = 'tool_result' ${sinceClause}
-      AND json_extract(attributes, '$.tool_name') IS NOT NULL
-    GROUP BY json_extract(attributes, '$.tool_name')
-    ORDER BY count DESC
-  `).all(params);
-
-  return {
-    tokenUsage,
-    totalCost: costRow?.total_cost ?? 0,
-    activeSessions: sessions.map(s => s.session_id),
-    toolUsage,
-  };
-}
-
 module.exports = {
   initDb,
   insertSnapshot, getLatestSnapshot, getSnapshots,
   insertScrapeLog, getRecentScrapeLog, getScheduleInfo,
-  insertOtelMetricsBatch, insertOtelEventsBatch,
-  getOtelMetrics, getOtelEvents, getOtelSummary,
 };
