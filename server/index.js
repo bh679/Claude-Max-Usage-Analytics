@@ -6,14 +6,23 @@ const { initDb } = require('./db');
 const scrapeRoutes = require('./routes/scrape');
 
 const PORT = process.env.PORT || 8080;
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 
 // Initialize database
 initDb();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: CORS_ORIGIN === '*' ? true : CORS_ORIGIN.split(','),
+  methods: ['GET', 'POST'],
+}));
 app.use(express.json());
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
 
 // Serve static dashboard files
 app.use(express.static(path.join(__dirname, '..', 'public')));

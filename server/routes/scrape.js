@@ -9,6 +9,7 @@ const {
   insertSnapshot, getLatestSnapshot, getSnapshots,
   insertScrapeLog, getRecentScrapeLog, getScheduleInfo,
 } = require('../db');
+const { requireApiKey, requireBasicAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ const router = express.Router();
 let isScraping = false;
 
 // POST /api/scrape — receives JSON from scraper, validates, stores in SQLite
-router.post('/', (req, res) => {
+router.post('/', requireApiKey, (req, res) => {
   const data = req.body;
 
   if (!data || !data.timestamp) {
@@ -45,8 +46,8 @@ router.get('/latest', (req, res) => {
   res.json(snapshot);
 });
 
-// GET /api/scrape/history?from=&to=&limit= — paginated history
-router.get('/history', (req, res) => {
+// GET /api/scrape/history?from=&to=&limit= — paginated history (basic auth required)
+router.get('/history', requireBasicAuth, (req, res) => {
   const { from, to, limit } = req.query;
   const snapshots = getSnapshots({
     from: from || undefined,

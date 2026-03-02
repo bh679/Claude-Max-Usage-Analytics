@@ -170,7 +170,7 @@ async function scrapeNow() {
 // ── Main usage data load ──────────────────────────────────────────────────────
 async function loadData() {
   try {
-    const res = await fetch('/api/scrape/latest');
+    const res = await fetch('api/scrape/latest');
     const snapshot = await res.json();
 
     if (!snapshot || snapshot.data === null) {

@@ -27,6 +27,7 @@ const jsonOutput = args.includes('--output=json');
 const saveToFile = args.includes('--save');
 const doPost = args.includes('--post') || args.some(a => a.startsWith('--post-url='));
 const postUrl = (args.find(a => a.startsWith('--post-url=')) || '').split('=')[1] || 'http://localhost:8080/api/scrape';
+const apiKey = (args.find(a => a.startsWith('--api-key=')) || '').split('=')[1] || process.env.SCRAPE_API_KEY || '';
 
 function log(...msg) {
   if (!jsonOutput) console.log(...msg);
@@ -166,9 +167,13 @@ async function main() {
   if (doPost) {
     log(`\nPOSTing data to ${postUrl}...`);
     const scrape_duration_ms = Date.now() - startMs;
+    const headers = { 'Content-Type': 'application/json' };
+    if (apiKey) {
+      headers['Authorization'] = `Bearer ${apiKey}`;
+    }
     const res = await fetch(postUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ ...data, scrape_duration_ms }),
     });
     if (res.ok) {
