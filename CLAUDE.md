@@ -146,6 +146,25 @@ Base port: `8080`. If occupied, increment by 1 until a free port is found.
 
 ---
 
+## Git Hooks
+
+### Version Validation Pre-commit Hook
+
+A pre-commit hook enforces the `V.MM.PPPP` versioning standard. It rejects commits that:
+- Don't include a `package.json` version bump
+- Use an invalid version format
+
+**Installation (required for each fresh clone/worktree):**
+
+```bash
+cp ~/Projects/Claude\ Templates/standards/hooks/pre-commit-version-check.sh .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+> Note: `.git/hooks/` is not tracked by git, so this must be installed manually in each working copy.
+
+---
+
 ## Versioning
 
 <!-- Full policy: github.com/bh679/claude-templates/standards/versioning.md -->
