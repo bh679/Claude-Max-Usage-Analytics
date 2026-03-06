@@ -12,6 +12,7 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 initDb();
 
 const app = express();
+app.set('trust proxy', 1);
 
 app.use(cors({
   origin: CORS_ORIGIN === '*' ? true : CORS_ORIGIN.split(','),
